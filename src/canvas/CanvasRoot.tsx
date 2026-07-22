@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { DiskBackground } from './scene/DiskBackground';
 import { ExplorerMesh } from './actors/ExplorerMesh';
+import { EventHorizon } from './scene/EventHorizon';
 
 export const CanvasRoot: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ export const CanvasRoot: React.FC = () => {
           <ExplorerMesh trackId="actor_1" color="#00ffff" />
           <ExplorerMesh trackId="actor_2" color="#ff00aa" />
           <ExplorerMesh trackId="actor_3" color="#aaff00" />
+          <EventHorizon />
         </Suspense>
 
         <OrbitControls 

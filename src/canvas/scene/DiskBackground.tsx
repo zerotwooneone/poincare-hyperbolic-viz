@@ -70,7 +70,7 @@ export const DiskBackground: React.FC = () => {
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
-      </mesh>
+      </mesh> 
     </group>
   );
 };
