@@ -2,8 +2,8 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useLatticeData } from '../../hooks/useLatticeData';
-import vertexShader from '../shaders/disk.vert';
-import fragmentShader from '../shaders/disk.frag';
+import vertexShader from '../shaders/disk.vert?raw';
+import fragmentShader from '../shaders/disk.frag?raw';
 
 export const DiskBackground: React.FC = () => {
   const data = useLatticeData();
