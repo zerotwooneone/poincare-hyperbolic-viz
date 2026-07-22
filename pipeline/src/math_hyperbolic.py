@@ -16,7 +16,7 @@ def conformal_scale(z):
 
 def get_geodesic_arc(z1, z2, num_points=50):
     """Generates a Euclidean circular arc (hyperbolic straight line) connecting z1 and z2."""
-    if np.isclose(np.cross([z1.real, z1.imag], [z2.real, z2.imag]), 0):
+    if np.isclose((z1.real * z2.imag) - (z1.imag * z2.real), 0):
         # Line passes through origin; it's a straight line segment
         t = np.linspace(0, 1, num_points)
         return z1 + t * (z2 - z1)
