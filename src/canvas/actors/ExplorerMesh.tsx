@@ -23,7 +23,17 @@ export const ExplorerMesh: React.FC<ExplorerProps> = ({ trackId, color }) => {
     const track = tracks[trackId];
     if (!track) return;
 
-    const currentIdx = Math.floor(frameCounter.current) % track.length;
+    // --- NEW PING-PONG LOGIC ---
+    const rawStep = Math.floor(frameCounter.current);
+    const cycle = Math.floor(rawStep / track.length); // Tracks how many times we've completed the array
+    const frameIndex = rawStep % track.length;        // Tracks our position within the current cycle
+
+    // If cycle is even (0, 2, 4...), play forward. If odd (1, 3, 5...), play in reverse.
+    const currentIdx = cycle % 2 === 0
+      ? frameIndex
+      : (track.length - 1) - frameIndex;
+    // ---------------------------
+
     const frameData = track[currentIdx];
 
     const s = frameData.scale * 0.08;
