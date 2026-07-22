@@ -1,41 +1,39 @@
-import os
-import json
 import numpy as np
-from math_hyperbolic import get_geodesic_arc, conformal_scale
+import json
 
-def generate_looping_track(num_frames=900):
-    """Generates a closed-loop geodesic triangular path for an explorer object."""
-    # Set up anchor points in the disk space
-    p1 = 0.2 + 0.1j
-    p2 = -0.5 + 0.4j
-    p3 = 0.1 - 0.6j
+def moebius_transform(z, a, theta=0):
+    """Applies a Möbius transformation to a complex coordinate."""
+    rotation = np.exp(1j * theta)
+    return rotation * (z - a) / (1 - np.conj(a) * z)
+
+def generate_geodesic_track(steps, start_real, offset_point, rotation_angle):
+    """Generates an array of JSON-serializable path coordinates."""
+    # Create a base linear geodesic passing through the center
+    t_values = np.linspace(-start_real, start_real, steps)
+    base_path = t_values + 0j 
     
-    frames_per_segment = num_frames // 3
-    
-    # Compute true arcs along non-Euclidean space curves
-    arc1 = get_geodesic_arc(p1, p2, frames_per_segment)
-    arc2 = get_geodesic_arc(p2, p3, frames_per_segment)
-    arc3 = get_geodesic_arc(p3, p1, frames_per_segment)
-    
-    full_path = np.concatenate([arc1, arc2, arc3])
-    
-    path_data = []
-    for z in full_path:
-        scale = conformal_scale(z)
-        path_data.append({
-            "x": float(z.real),
-            "y": float(z.imag),
-            "scale": float(scale)
-        })
+    track = []
+    for z in base_path:
+        # Transform the linear path into a curved off-center arc
+        transformed = moebius_transform(z, offset_point, rotation_angle)
         
-    return path_data
+        # Calculate hyperbolic distance from origin to scale the actor (perspective)
+        r = np.abs(transformed)
+        hyperbolic_scale = 1.0 - r**2 # Actor shrinks near the boundary
+        
+        track.append({
+            "x": transformed.real,
+            "y": transformed.imag,
+            "scale": hyperbolic_scale
+        })
+    return track
 
-if __name__ == "__main__":
-    print("🎬 Baking Actor Geodesic Loops and Space Scale Factors...")
-    actor_loop = generate_looping_track(num_frames=900)
-    
-    out_dir = "../public/generated/paths"
-    os.makedirs(out_dir, exist_ok=True)
-    with open(os.path.join(out_dir, "actor_tracks.json"), "w") as f:
-        json.dump({"actor_1": actor_loop}, f)
-    print(f"✅ Pre-baked {len(actor_loop)} frames cleanly to {out_dir}/actor_tracks.json")
+# Generate multiple distinct paths
+tracks = {
+    "actor_1": generate_geodesic_track(200, 0.98, 0.3 + 0.4j, np.pi/4),
+    "actor_2": generate_geodesic_track(200, 0.95, -0.5 + 0.1j, -np.pi/3),
+    "actor_3": generate_geodesic_track(200, 0.99, 0.1 - 0.7j, np.pi/2)
+}
+
+with open("../public/generated/paths.json", "w") as f:
+    json.dump(tracks, f)

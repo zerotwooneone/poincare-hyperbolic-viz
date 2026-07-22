@@ -14,7 +14,9 @@ export const CanvasRoot: React.FC = () => {
         
         <Suspense fallback={null}>
           <DiskBackground />
-          <ExplorerMesh />
+          <ExplorerMesh trackId="actor_1" color="#00ffff" />
+          <ExplorerMesh trackId="actor_2" color="#ff00aa" />
+          <ExplorerMesh trackId="actor_3" color="#aaff00" />
         </Suspense>
 
         <OrbitControls 
