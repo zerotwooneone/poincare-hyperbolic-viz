@@ -14,26 +14,28 @@ export const ExplorerMesh: React.FC = () => {
   useFrame(() => {
     if (!tracks || !actorRef.current || !isPlaying) return;
 
-    // Fast tracking lookup using integers to avoid React state re-renders
     const track = tracks.actor_1;
     const currentIdx = Math.floor(frameCounter.current) % track.length;
     const frameData = track[currentIdx];
 
-    // Map 2D non-Euclidean coordinates to 3D space positions
-    actorRef.current.position.set(frameData.x, frameData.y, 0.02);
-    
-    // Crucial step: scale down as the object approaches the edge of infinity
     const s = frameData.scale * 0.08;
     actorRef.current.scale.set(s, s, s);
+    
+    // Set Z exactly to 's' so the bottom point of the diamond perfectly touches the floor
+    actorRef.current.position.set(frameData.x, frameData.y, s);
+    
+    // Tumble the geometry dynamically
+    actorRef.current.rotation.x += 0.02 * speed;
+    actorRef.current.rotation.y += 0.03 * speed;
 
-    // Update frame position based on custom global velocity speeds
     frameCounter.current += speed;
   });
 
   return (
     <mesh ref={actorRef}>
       <octahedronGeometry args={[1, 0]} />
-      <meshStandardMaterial emissive="#00ffff" emissiveIntensity={2} color="#00ffff" roughness={0.1} />
+      {/* Darken the base color so the emissive glow takes over */}
+      <meshStandardMaterial emissive="#00ffff" emissiveIntensity={3} color="#004444" roughness={0.2} />
     </mesh>
   );
 };

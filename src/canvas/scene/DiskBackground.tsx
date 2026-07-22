@@ -8,8 +8,6 @@ import fragmentShader from '../shaders/disk.frag?raw';
 export const DiskBackground: React.FC = () => {
   const data = useLatticeData();
   const materialRef = useRef<THREE.ShaderMaterial>(null);
-
-  // Load the pre-calculated texture LUT
   const lutTexture = useLoader(THREE.TextureLoader, '/generated/textures/space_gradient.png');
 
   const geometry = useMemo(() => {
@@ -30,18 +28,31 @@ export const DiskBackground: React.FC = () => {
   if (!geometry) return null;
 
   return (
-    <mesh geometry={geometry}>
-      <shaderMaterial
-        ref={materialRef}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        uniforms={{
-          uColorLUT: { value: lutTexture },
-          uTime: { value: 0 }
-        }}
-        side={THREE.DoubleSide}
-        transparent
-      />
-    </mesh>
+    <group>
+      {/* Base colored glowing plane */}
+      <mesh geometry={geometry}>
+        <shaderMaterial
+          ref={materialRef}
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShader}
+          uniforms={{ uColorLUT: { value: lutTexture }, uTime: { value: 0 } }}
+          side={THREE.DoubleSide}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending} // Fixes the pink static Z-fighting!
+        />
+      </mesh>
+      
+      {/* Cyberpunk neon wireframe overlay */}
+      <mesh geometry={geometry}>
+        <meshBasicMaterial 
+          color="#aa00ff" 
+          wireframe 
+          transparent 
+          opacity={0.15} 
+          blending={THREE.AdditiveBlending} 
+        />
+      </mesh>
+    </group>
   );
 };
