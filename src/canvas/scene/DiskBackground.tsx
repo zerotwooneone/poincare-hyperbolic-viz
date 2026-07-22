@@ -29,7 +29,7 @@ export const DiskBackground: React.FC = () => {
 
   return (
     <group>
-      {/* Base colored glowing plane */}
+      {/* Base plane: Darkened and returned to normal blending */}
       <mesh geometry={geometry}>
         <shaderMaterial
           ref={materialRef}
@@ -38,19 +38,20 @@ export const DiskBackground: React.FC = () => {
           uniforms={{ uColorLUT: { value: lutTexture }, uTime: { value: 0 } }}
           side={THREE.DoubleSide}
           transparent
-          depthWrite={false}
-          blending={THREE.AdditiveBlending} // Fixes the pink static Z-fighting!
+          depthWrite={false} // Keeps the Z-fighting away without blowing out the colors
+          opacity={0.6} // Darken the base so the wireframe pops
         />
       </mesh>
       
-      {/* Cyberpunk neon wireframe overlay */}
+      {/* The Non-Euclidean Lattice: Increased opacity and intensity */}
       <mesh geometry={geometry}>
         <meshBasicMaterial 
-          color="#aa00ff" 
+          color="#d400ff" // Brighter pink/purple
           wireframe 
           transparent 
-          opacity={0.15} 
+          opacity={0.7} // Significantly more visible
           blending={THREE.AdditiveBlending} 
+          depthWrite={false}
         />
       </mesh>
     </group>

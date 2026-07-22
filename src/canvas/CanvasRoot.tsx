@@ -25,9 +25,12 @@ export const CanvasRoot: React.FC = () => {
           autoRotateSpeed={0.5} 
         />
 
-        {/* The Cyberpunk Glow Engine */}
+        {/* 
+          Increased luminanceThreshold to 0.85. 
+          Now, only the high-intensity wireframe and emissive explorer will glow.
+        */}
         <EffectComposer disableNormalPass>
-          <Bloom luminanceThreshold={0.1} mipmapBlur intensity={1.5} />
+          <Bloom luminanceThreshold={0.85} mipmapBlur intensity={2.0} />
         </EffectComposer>
       </Canvas>
     </div>
