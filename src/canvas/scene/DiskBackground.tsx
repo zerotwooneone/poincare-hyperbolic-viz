@@ -5,9 +5,19 @@ import { useLatticeData } from '../../hooks/useLatticeData';
 import vertexShader from '../shaders/disk.vert?raw';
 import fragmentShader from '../shaders/disk.frag?raw';
 
+// A tiny fragment shader just to render the solid neon pink for the wireframe
+const wireframeFragmentShader = `
+uniform vec3 uColor;
+uniform float uOpacity;
+void main() {
+    gl_FragColor = vec4(uColor, uOpacity);
+}
+`;
+
 export const DiskBackground: React.FC = () => {
   const data = useLatticeData();
-  const materialRef = useRef<THREE.ShaderMaterial>(null);
+  const baseMaterialRef = useRef<THREE.ShaderMaterial>(null);
+  const wireMaterialRef = useRef<THREE.ShaderMaterial>(null);
   const lutTexture = useLoader(THREE.TextureLoader, '/generated/textures/space_gradient.png');
 
   const geometry = useMemo(() => {
@@ -20,37 +30,44 @@ export const DiskBackground: React.FC = () => {
   }, [data]);
 
   useFrame((state) => {
-    if (materialRef.current) {
-      materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime();
-    }
+    const t = state.clock.getElapsedTime();
+    // Update the uTime uniform for BOTH materials so they pan together
+    if (baseMaterialRef.current) baseMaterialRef.current.uniforms.uTime.value = t;
+    if (wireMaterialRef.current) wireMaterialRef.current.uniforms.uTime.value = t;
   });
 
   if (!geometry) return null;
 
   return (
     <group>
-      {/* Base plane: Darkened and returned to normal blending */}
+      {/* Base plane */}
       <mesh geometry={geometry}>
         <shaderMaterial
-          ref={materialRef}
+          ref={baseMaterialRef}
           vertexShader={vertexShader}
           fragmentShader={fragmentShader}
           uniforms={{ uColorLUT: { value: lutTexture }, uTime: { value: 0 } }}
           side={THREE.DoubleSide}
           transparent
-          depthWrite={false} // Keeps the Z-fighting away without blowing out the colors
-          opacity={0.6} // Darken the base so the wireframe pops
+          depthWrite={false}
+          opacity={0.6}
         />
       </mesh>
-      
-      {/* The Non-Euclidean Lattice: Increased opacity and intensity */}
+
+      {/* The Non-Euclidean Lattice */}
       <mesh geometry={geometry}>
-        <meshBasicMaterial 
-          color="#d400ff" // Brighter pink/purple
-          wireframe 
-          transparent 
-          opacity={0.7} // Significantly more visible
-          blending={THREE.AdditiveBlending} 
+        <shaderMaterial
+          ref={wireMaterialRef}
+          vertexShader={vertexShader}
+          fragmentShader={wireframeFragmentShader}
+          uniforms={{
+            uTime: { value: 0 },
+            uColor: { value: new THREE.Color('#d400ff') },
+            uOpacity: { value: 0.7 }
+          }}
+          wireframe={true}
+          transparent
+          blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </mesh>

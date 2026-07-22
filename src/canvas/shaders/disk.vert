@@ -1,5 +1,6 @@
 uniform float uTime;
 varying vec2 vUv;
+varying float vRadius; // <-- Re-added to satisfy disk.frag
 
 // Complex Number Multiplication: (a+bi) * (c+di)
 vec2 cMul(vec2 a, vec2 b) {
@@ -22,7 +23,6 @@ void main() {
     vec2 z = position.xy;
 
     // Create a time-based panning offset 'a' inside the unit disk
-    // Oscillate between -0.4 and 0.4 on the real axis
     float panSpeed = uTime * 0.2;
     vec2 a = vec2(sin(panSpeed) * 0.4, cos(panSpeed * 0.5) * 0.2); 
 
@@ -37,7 +37,10 @@ void main() {
     // Final Transformation: w = (z - a) / (1 - conj(a)*z)
     vec2 w = cDiv(num, den);
 
-    // Reconstruct position (retain original Z for additive blending layering)
+    // Calculate the new radius based on the transformed coordinate for the fragment shader
+    vRadius = length(w);
+
+    // Reconstruct position
     vec3 transformedPos = vec3(w.x, w.y, position.z);
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(transformedPos, 1.0);
