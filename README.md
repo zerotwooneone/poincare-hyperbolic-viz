@@ -31,8 +31,7 @@ Before running the frontend, you must bake the non-Euclidean geometries and traj
 ```bash
 cd pipeline
 # uv will automatically resolve dependencies and run the build script
-uv run run_pipeline.sh
-cd ..
+run_pipeline.sh
 ```
 
 *Note: If `public/generated/` is successfully populated, you are ready to start the UI.*
