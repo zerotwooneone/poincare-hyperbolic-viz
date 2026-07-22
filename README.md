@@ -1,4 +1,5 @@
 # Poincaré Disk Hyperbolic Visualization
+![poincare hyperbolic example](poincare.small.gif)
 
 A real-time, non-Euclidean WebGL visualization built with React Three Fiber. This project renders a mesmerizing, infinitely repeating {7,3} hyperbolic tessellation (Poincaré Disk) populated by actors navigating complex geodesic paths.
 
